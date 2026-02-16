@@ -1,0 +1,105 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Manual testing script for ruby_llm-text gem
+# Requires API keys to be set in environment variables
+
+require 'bundler/setup'
+require 'ruby_llm/text'
+
+# Check for API keys
+unless ENV["OPENAI_API_KEY"] || ENV["ANTHROPIC_API_KEY"]
+  puts "❌ Please set OPENAI_API_KEY or ANTHROPIC_API_KEY environment variable"
+  puts "   export OPENAI_API_KEY='your-key'"
+  puts "   export ANTHROPIC_API_KEY='your-key'"
+  exit 1
+end
+
+# Configure ruby_llm
+RubyLLM.configure do |config|
+  if ENV["ANTHROPIC_API_KEY"]
+    config.anthropic_api_key = ENV["ANTHROPIC_API_KEY"]
+    config.default_model = "claude-haiku-4-5"
+    puts "🔧 Using Anthropic Claude"
+  elsif ENV["OPENAI_API_KEY"]
+    config.openai_api_key = ENV["OPENAI_API_KEY"]
+    config.default_model = "gpt-4.1-mini"
+    puts "🔧 Using OpenAI GPT"
+  end
+end
+
+puts "🚀 Testing ruby_llm-text gem with real API calls...\n\n"
+
+# Test data
+article = "Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write. Ruby was created by Yukihiro Matsumoto in the mid-1990s and has become popular for web development, automation, and data processing."
+
+person_text = "My name is Alice Johnson and I'm 28 years old. I work as a software engineer at a tech startup in San Francisco."
+
+review = "This product exceeded my expectations! The quality is outstanding and it arrived quickly."
+
+# Test 1: Summarize
+puts "1️⃣  Testing summarize..."
+begin
+  summary = RubyLLM::Text.summarize(article, length: :short)
+  puts "   ✅ Original: #{article[0..50]}..."
+  puts "   📝 Summary: #{summary}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 2: Translate
+puts "2️⃣  Testing translate..."
+begin
+  translation = RubyLLM::Text.translate("Good morning, how are you?", to: "spanish")
+  puts "   ✅ English: Good morning, how are you?"
+  puts "   🌍 Spanish: #{translation}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 3: Extract
+puts "3️⃣  Testing extract..."
+begin
+  schema = { name: :string, age: :integer, job: :string, city: :string }
+  extracted = RubyLLM::Text.extract(person_text, schema: schema)
+  puts "   ✅ Text: #{person_text}"
+  puts "   📊 Extracted: #{extracted}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 4: Classify
+puts "4️⃣  Testing classify..."
+begin
+  sentiment = RubyLLM::Text.classify(review, categories: ["positive", "negative", "neutral"])
+  puts "   ✅ Review: #{review}"
+  puts "   🎯 Sentiment: #{sentiment}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 5: String extensions (if available)
+puts "5️⃣  Testing string extensions..."
+begin
+  require 'ruby_llm/text/string_ext'
+
+  short_summary = "This is a longer text that should be summarized.".summarize(length: :short)
+  puts "   ✅ String extension works!"
+  puts "   📝 Summary: #{short_summary}"
+rescue LoadError
+  puts "   ⚠️  String extensions not loaded (optional)"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n🎉 Manual testing complete!"
+puts "\n💡 Tip: Try different models by setting:"
+puts "   RubyLLM::Text.summarize(text, model: 'claude-sonnet-4-5')"
