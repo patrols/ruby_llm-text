@@ -12,7 +12,18 @@ module RubyLLM
           # For structured output with confidence score
           schema = build_confidence_schema(question)
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
-          result = JSON.parse(Base.clean_json_response(response))
+
+          begin
+            result = JSON.parse(Base.clean_json_response(response))
+          rescue JSON::ParserError
+            # Fallback: if JSON parsing fails, return a structured response with error info
+            cleaned_response = Base.clean_json_response(response)
+            result = {
+              "answer" => cleaned_response,
+              "confidence" => nil,
+              "error" => "Failed to parse JSON response: #{cleaned_response}"
+            }
+          end
 
           # Convert confidence to float and handle boolean conversion
           if result.key?("confidence")

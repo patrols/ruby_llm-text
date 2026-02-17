@@ -20,7 +20,18 @@ module RubyLLM
             required: [ "corrected", "changes" ]
           }
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
-          JSON.parse(Base.clean_json_response(response))
+
+          begin
+            JSON.parse(Base.clean_json_response(response))
+          rescue JSON::ParserError
+            # Fallback: if JSON parsing fails, return structured response with error info
+            cleaned_response = Base.clean_json_response(response)
+            {
+              "corrected" => cleaned_response,
+              "changes" => [],
+              "error" => "Failed to parse JSON response: #{cleaned_response}"
+            }
+          end
         else
           Base.call_llm(prompt, model: model, **options)
         end
