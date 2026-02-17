@@ -21,10 +21,18 @@ module RubyLLM
             required: [ "label", "confidence" ]
           }
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
-          result = JSON.parse(clean_json_response(response))
-          # Ensure confidence is a float
-          result["confidence"] = result["confidence"].to_f
-          result
+
+          begin
+            result = JSON.parse(clean_json_response(response))
+            # Ensure confidence is a float
+            result["confidence"] = result["confidence"].to_f
+            result
+          rescue JSON::ParserError
+            # Fallback: if JSON parsing fails, try simple mode
+            simple_prompt = build_prompt(text, categories: categories, simple: true)
+            simple_response = Base.call_llm(simple_prompt, model: model, **options)
+            { "label" => simple_response.strip, "confidence" => 0.7 }
+          end
         end
       end
 
