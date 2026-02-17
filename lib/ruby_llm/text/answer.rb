@@ -2,6 +2,8 @@ module RubyLLM
   module Text
     module Answer
       def self.call(text, question, include_confidence: false, model: nil, **options)
+        raise ArgumentError, "question is required" if question.nil? || question.strip.empty?
+
         model ||= RubyLLM::Text.config.model_for(:answer)
 
         prompt = build_prompt(text, question, include_confidence: include_confidence)
@@ -10,7 +12,7 @@ module RubyLLM
           # For structured output with confidence score
           schema = build_confidence_schema(question)
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
-          result = JSON.parse(clean_json_response(response))
+          result = JSON.parse(Base.clean_json_response(response))
 
           # Convert confidence to float and handle boolean conversion
           if result.key?("confidence")
@@ -36,38 +38,6 @@ module RubyLLM
       end
 
       private
-
-      def self.clean_json_response(response)
-        # Remove markdown code block formatting if present
-        cleaned = response.gsub(/^```json\n/, "").gsub(/\n```$/, "").strip
-
-        # If still no JSON, try to extract JSON from mixed content
-        if !cleaned.start_with?("{") && cleaned.include?("{")
-          # Find JSON object in the response with proper brace matching
-          brace_count = 0
-          start_pos = cleaned.index("{")
-          if start_pos
-            end_pos = start_pos
-            cleaned[start_pos..-1].each_char.with_index(start_pos) do |char, i|
-              if char == "{"
-                brace_count += 1
-              elsif char == "}"
-                brace_count -= 1
-                if brace_count == 0
-                  end_pos = i
-                  break
-                end
-              end
-            end
-
-            if brace_count == 0
-              cleaned = cleaned[start_pos..end_pos]
-            end
-          end
-        end
-
-        cleaned
-      end
 
       def self.build_prompt(text, question, include_confidence:)
         if include_confidence

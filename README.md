@@ -450,10 +450,10 @@ The gem provides clear error messages for common issues:
 
 ```ruby
 # Missing required parameters
-RubyLLM::Text.extract("text")  # ArgumentError: schema is required
+RubyLLM::Text.extract("text")  # ArgumentError: schema is required for extraction
 RubyLLM::Text.classify("text", categories: [])  # ArgumentError: categories are required
-RubyLLM::Text.answer("text", nil)  # ArgumentError: question is required
-RubyLLM::Text.rewrite("text")  # ArgumentError: Must specify tone, style, or instruction
+RubyLLM::Text.answer("text", "")  # ArgumentError: question is required
+RubyLLM::Text.rewrite("text")  # ArgumentError: Must specify at least one of: tone, style, or instruction
 
 # API errors are wrapped with context
 RubyLLM::Text.summarize("text")  # RubyLLM::Text::Error: LLM call failed: [original error]

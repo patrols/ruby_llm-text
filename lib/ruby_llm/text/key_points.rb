@@ -1,12 +1,6 @@
 module RubyLLM
   module Text
     module KeyPoints
-      FORMATS = {
-        bullets: "• ",
-        numbers: "1. ",
-        sentences: ""
-      }.freeze
-
       def self.call(text, max_points: nil, format: :sentences, model: nil, **options)
         model ||= RubyLLM::Text.config.model_for(:key_points)
 
