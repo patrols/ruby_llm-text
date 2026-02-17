@@ -16,12 +16,11 @@ module RubyLLM
           begin
             result = JSON.parse(Base.clean_json_response(response))
           rescue JSON::ParserError
-            # Fallback: if JSON parsing fails, return a structured response with error info
+            # Fallback: if JSON parsing fails, return best-effort structured response
             cleaned_response = Base.clean_json_response(response)
             result = {
               "answer" => cleaned_response,
-              "confidence" => nil,
-              "error" => "Failed to parse JSON response: #{cleaned_response}"
+              "confidence" => nil
             }
           end
 
