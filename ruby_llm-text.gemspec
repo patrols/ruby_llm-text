@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email         = [ "patrick@rendal.me" ]
   spec.homepage      = "https://github.com/patrols/ruby_llm-text"
   spec.summary       = "ActiveSupport-style LLM utilities for Ruby"
-  spec.description   = "Intuitive one-liner utility methods for common LLM tasks like summarize, translate, extract, and classify."
+  spec.description   = "Intuitive one-liner utility methods for common LLM tasks like text summarization, translation, data extraction, classification, grammar correction, sentiment analysis, key point extraction, text rewriting, and question answering."
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
 
