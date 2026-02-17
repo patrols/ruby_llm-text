@@ -24,8 +24,8 @@ module RubyLLM
             }
           end
 
-          # Convert confidence to float and handle boolean conversion
-          if result.key?("confidence")
+          # Convert confidence to float when present (preserve nil as "unknown")
+          if result.key?("confidence") && !result["confidence"].nil?
             result["confidence"] = result["confidence"].to_f
           end
 
