@@ -27,15 +27,10 @@ module RubyLLM
             # Ensure confidence is a float
             result["confidence"] = result["confidence"].to_f
             result
-          rescue JSON::ParserError => e
-            # If JSON parsing fails, log the error and return a structured error result
-            warn "[RubyLLM::Text::Sentiment] Failed to parse JSON response: #{e.message}"
-            {
-              "label" => nil,
-              "confidence" => nil,
-              "error" => "JSON::ParserError: #{e.message}",
-              "raw_response" => response
-            }
+          rescue JSON::ParserError
+            # If JSON parsing fails, fall back to simple mode (no schema), as documented.
+            simple_prompt = build_prompt(text, categories: categories, simple: true)
+            Base.call_llm(simple_prompt, model: model, **options)
           end
         end
       end
