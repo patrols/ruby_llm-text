@@ -37,6 +37,12 @@ person_text = "My name is Alice Johnson and I'm 28 years old. I work as a softwa
 
 review = "This product exceeded my expectations! The quality is outstanding and it arrived quickly."
 
+grammar_text = "Their going to the stor tommorow to buy some grate stuff."
+
+meeting_notes = "We discussed budget allocation for Q3. The team agreed to hire two new developers. Marketing campaign will launch next month. Everyone should submit timesheets by Friday."
+
+casual_text = "hey whats up, r u free tmrw?"
+
 # Test 1: Summarize
 puts "1️⃣  Testing summarize..."
 begin
@@ -86,20 +92,96 @@ end
 
 puts "\n" + "="*50 + "\n"
 
-# Test 5: String extensions (if available)
-puts "5️⃣  Testing string extensions..."
+# Test 5: Fix Grammar (Phase 2)
+puts "5️⃣  Testing fix_grammar..."
+begin
+  corrected = RubyLLM::Text.fix_grammar(grammar_text)
+  puts "   ✅ Original: #{grammar_text}"
+  puts "   🔧 Corrected: #{corrected}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 6: Sentiment (Phase 2)
+puts "6️⃣  Testing sentiment..."
+begin
+  sentiment = RubyLLM::Text.sentiment(review)
+  puts "   ✅ Review: #{review}"
+  puts "   😊 Sentiment: #{sentiment}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 7: Key Points (Phase 2)
+puts "7️⃣  Testing key_points..."
+begin
+  points = RubyLLM::Text.key_points(meeting_notes, max_points: 3)
+  puts "   ✅ Notes: #{meeting_notes}"
+  puts "   📋 Key Points:"
+  points.each_with_index { |point, i| puts "      #{i+1}. #{point}" }
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 8: Rewrite (Phase 2)
+puts "8️⃣  Testing rewrite..."
+begin
+  professional = RubyLLM::Text.rewrite(casual_text, tone: :professional)
+  puts "   ✅ Casual: #{casual_text}"
+  puts "   👔 Professional: #{professional}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 9: Answer (Phase 2)
+puts "9️⃣  Testing answer..."
+begin
+  answer = RubyLLM::Text.answer(article, "What programming language is this about?")
+  boolean_answer = RubyLLM::Text.answer(article, "Is this about programming?")
+  puts "   ✅ Article: #{article[0..50]}..."
+  puts "   ❓ What language? #{answer}"
+  puts "   ❓ About programming? #{boolean_answer}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 10: String extensions (if available)
+puts "🔟 Testing string extensions..."
 begin
   require 'ruby_llm/text/string_ext'
 
   short_summary = "This is a longer text that should be summarized.".summarize(length: :short)
-  puts "   ✅ String extension works!"
+  puts "   ✅ Phase 1 extensions work!"
   puts "   📝 Summary: #{short_summary}"
+
+  # Test Phase 2 extensions
+  corrected_ext = grammar_text.fix_grammar
+  sentiment_ext = review.sentiment(simple: true)
+  puts "   ✅ Phase 2 extensions work!"
+  puts "   🔧 Grammar: #{corrected_ext}"
+  puts "   😊 Sentiment: #{sentiment_ext}"
 rescue LoadError
   puts "   ⚠️  String extensions not loaded (optional)"
 rescue => e
   puts "   ❌ Error: #{e.message}"
 end
 
-puts "\n🎉 Manual testing complete!"
-puts "\n💡 Tip: Try different models by setting:"
-puts "   RubyLLM::Text.summarize(text, model: 'claude-sonnet-4-5')"
+puts "\n🎉 Manual testing complete - Phase 1 & 2!"
+puts "\n💡 Tips:"
+puts "   • Try different models: RubyLLM::Text.summarize(text, model: 'claude-sonnet-4-5')"
+puts "   • Configure method-specific models:"
+puts "     RubyLLM::Text.configure do |config|"
+puts "       config.sentiment_model = 'claude-haiku-4-5'"
+puts "       config.rewrite_model = 'gpt-4.1'"
+puts "     end"
+puts "   • All Phase 2 methods: fix_grammar, sentiment, key_points, rewrite, answer"
