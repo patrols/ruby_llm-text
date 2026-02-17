@@ -10,7 +10,7 @@ module RubyLLM
           # For structured output with confidence score
           schema = build_confidence_schema(question)
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
-          result = JSON.parse(response)
+          result = JSON.parse(clean_json_response(response))
 
           # Convert confidence to float and handle boolean conversion
           if result.key?("confidence")
@@ -36,6 +36,11 @@ module RubyLLM
       end
 
       private
+
+      def self.clean_json_response(response)
+        # Remove markdown code block formatting if present
+        response.gsub(/^```json\n/, "").gsub(/\n```$/, "").strip
+      end
 
       def self.build_prompt(text, question, include_confidence:)
         if include_confidence

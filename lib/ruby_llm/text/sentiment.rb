@@ -21,7 +21,7 @@ module RubyLLM
             required: [ "label", "confidence" ]
           }
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
-          result = JSON.parse(response)
+          result = JSON.parse(clean_json_response(response))
           # Ensure confidence is a float
           result["confidence"] = result["confidence"].to_f
           result
@@ -29,6 +29,11 @@ module RubyLLM
       end
 
       private
+
+      def self.clean_json_response(response)
+        # Remove markdown code block formatting if present
+        response.gsub(/^```json\n/, "").gsub(/\n```$/, "").strip
+      end
 
       def self.build_prompt(text, categories:, simple:)
         categories_list = categories.join(", ")

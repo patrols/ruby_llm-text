@@ -20,13 +20,18 @@ module RubyLLM
             required: [ "corrected", "changes" ]
           }
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
-          JSON.parse(response)
+          JSON.parse(clean_json_response(response))
         else
           Base.call_llm(prompt, model: model, **options)
         end
       end
 
       private
+
+      def self.clean_json_response(response)
+        # Remove markdown code block formatting if present
+        response.gsub(/^```json\n/, "").gsub(/\n```$/, "").strip
+      end
 
       def self.build_prompt(text, explain:, preserve_style:)
         style_instruction = preserve_style ?
