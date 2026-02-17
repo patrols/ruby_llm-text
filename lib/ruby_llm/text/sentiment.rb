@@ -32,7 +32,16 @@ module RubyLLM
 
       def self.clean_json_response(response)
         # Remove markdown code block formatting if present
-        response.gsub(/^```json\n/, "").gsub(/\n```$/, "").strip
+        cleaned = response.gsub(/^```json\n/, "").gsub(/\n```$/, "").strip
+
+        # If still no JSON, try to extract JSON from mixed content
+        if !cleaned.start_with?("{") && cleaned.include?("{")
+          # Find JSON object in the response
+          json_match = cleaned.match(/\{[^}]*\}/m)
+          cleaned = json_match[0] if json_match
+        end
+
+        cleaned
       end
 
       def self.build_prompt(text, categories:, simple:)
