@@ -66,10 +66,14 @@ module RubyLLM
         schema_class = Class.new(RubyLLM::Schema)
 
         # Handle JSON Schema-style hashes (e.g., {type: "object", properties: {...}})
-        if schema[:type] == "object" && schema[:properties]
+        # Check both symbol and string keys to handle parsed JSON
+        schema_type = schema[:type] || schema["type"]
+        schema_properties = schema[:properties] || schema["properties"]
+
+        if schema_type == "object" && schema_properties
           required_fields = schema[:required] || schema["required"] || []
 
-          schema[:properties].each do |field, spec|
+          schema_properties.each do |field, spec|
             # Build constraint options
             constraints = {}
 
@@ -83,7 +87,8 @@ module RubyLLM
             end
 
             # Handle oneOf union types - default to string for compatibility
-            if spec[:oneOf]
+            # Check both symbol and string keys
+            if spec[:oneOf] || spec["oneOf"]
               schema_class.string field, **constraints # Use string as most flexible type
             else
               case spec[:type] || spec["type"]
