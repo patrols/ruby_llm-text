@@ -96,7 +96,7 @@ module RubyLLM
         question_lower.start_with?("is ", "are ", "was ", "were ", "do ", "does ", "did ", "can ", "could ", "will ", "would ", "should ") ||
         question_lower.start_with?("has ", "have ", "had ") ||
         question_lower.include?(" or not") ||
-        question_lower.end_with?("?") && (question_lower.include?("yes") || question_lower.include?("no"))
+        question_lower.end_with?("?") && question_lower.match?(/\b(yes|no)\b/)
       end
 
       def self.is_boolean_answer?(answer)
