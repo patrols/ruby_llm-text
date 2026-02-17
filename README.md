@@ -7,7 +7,7 @@ ActiveSupport-style LLM utilities for Ruby that make AI operations feel like nat
 
 ## Overview
 
-`ruby_llm-text` provides intuitive one-liner utility methods for common LLM tasks like summarizing text, translation, data extraction, and classification. It integrates seamlessly with the [ruby_llm](https://github.com/crmne/ruby_llm) ecosystem, providing a simple interface without requiring chat objects, message arrays, or configuration boilerplate.
+`ruby_llm-text` provides intuitive one-liner utility methods for common LLM tasks including text summarization, translation, data extraction, classification, grammar correction, sentiment analysis, key point extraction, text rewriting, and question answering. It integrates seamlessly with the [ruby_llm](https://github.com/crmne/ruby_llm) ecosystem, providing a simple interface without requiring chat objects, message arrays, or configuration boilerplate.
 
 ## Installation
 
@@ -53,6 +53,16 @@ data = RubyLLM::Text.extract(text, schema: { name: :string, age: :integer })
 # Classify text
 review = "This product is amazing!"
 sentiment = RubyLLM::Text.classify(review, categories: ["positive", "negative", "neutral"])
+
+# Fix grammar and spelling
+corrected = RubyLLM::Text.fix_grammar("Their going to the stor tommorow")
+
+# Get sentiment with confidence
+sentiment_analysis = RubyLLM::Text.sentiment("I love this product!")
+# => {"label" => "positive", "confidence" => 0.95}
+
+# Extract key points from long text
+points = RubyLLM::Text.key_points("Long meeting notes...", max_points: 3)
 ```
 
 ## API Reference
@@ -66,12 +76,14 @@ RubyLLM::Text.summarize(text, length: :medium, max_words: nil, model: nil)
 ```
 
 **Parameters:**
+
 - `text` (String): The text to summarize
 - `length` (Symbol|String): Predefined length (`:short`, `:medium`, `:detailed`) or custom description
 - `max_words` (Integer, optional): Maximum word count for summary
 - `model` (String, optional): Specific model to use
 
 **Examples:**
+
 ```ruby
 # Basic usage
 RubyLLM::Text.summarize("Long article text...")
@@ -95,12 +107,14 @@ RubyLLM::Text.translate(text, to:, from: nil, model: nil)
 ```
 
 **Parameters:**
+
 - `text` (String): The text to translate
 - `to` (String): Target language (e.g., "en", "spanish", "français")
 - `from` (String, optional): Source language for better accuracy
 - `model` (String, optional): Specific model to use
 
 **Examples:**
+
 ```ruby
 # Basic translation
 RubyLLM::Text.translate("Bonjour", to: "en")
@@ -121,17 +135,20 @@ RubyLLM::Text.extract(text, schema:, model: nil)
 ```
 
 **Parameters:**
+
 - `text` (String): The text to extract data from
 - `schema` (Hash): Data structure specification
 - `model` (String, optional): Specific model to use
 
 **Schema Types:**
+
 - `:string` - Text fields
 - `:integer`, `:number` - Numeric fields
 - `:boolean` - True/false fields
 - `:array` - List fields
 
 **Examples:**
+
 ```ruby
 # Extract person details
 text = "John Smith is 30 years old and works as a software engineer in San Francisco."
@@ -163,11 +180,13 @@ RubyLLM::Text.classify(text, categories:, model: nil)
 ```
 
 **Parameters:**
+
 - `text` (String): The text to classify
 - `categories` (Array): List of possible categories
 - `model` (String, optional): Specific model to use
 
 **Examples:**
+
 ```ruby
 # Sentiment analysis
 review = "This product exceeded my expectations!"
@@ -186,6 +205,173 @@ email = "URGENT: Server is down and customers can't access the site"
 priority = RubyLLM::Text.classify(email,
   categories: ["low", "medium", "high", "critical"]
 )
+```
+
+### Fix Grammar
+
+Correct grammar, spelling, and punctuation errors.
+
+```ruby
+RubyLLM::Text.fix_grammar(text, explain: false, preserve_style: false, model: nil)
+```
+
+**Parameters:**
+
+- `text` (String): The text to correct
+- `explain` (Boolean, optional): Return explanations of changes made (default: false)
+- `preserve_style` (Boolean, optional): Keep original tone and style (default: false)
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+# Basic grammar correction
+RubyLLM::Text.fix_grammar("Their going to the stor tommorow")
+# => "They're going to the store tomorrow"
+
+# With explanations
+result = RubyLLM::Text.fix_grammar("bad grammer here", explain: true)
+# => {"corrected" => "bad grammar here", "changes" => ["grammer → grammar"]}
+
+# Preserve casual style
+RubyLLM::Text.fix_grammar("hey whats up", preserve_style: true)
+# => "Hey, what's up?" (keeps casual tone)
+```
+
+### Sentiment
+
+Analyze sentiment with confidence scores.
+
+```ruby
+RubyLLM::Text.sentiment(text, categories: ["positive", "negative", "neutral"], simple: false, model: nil)
+```
+
+**Parameters:**
+
+- `text` (String): The text to analyze
+- `categories` (Array, optional): Custom sentiment categories (default: positive/negative/neutral)
+- `simple` (Boolean, optional): Return just the label without confidence (default: false)
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+# Basic sentiment analysis with confidence
+RubyLLM::Text.sentiment("I love this product!")
+# => {"label" => "positive", "confidence" => 0.95}
+
+# Simple mode (just the label)
+RubyLLM::Text.sentiment("Great service!", simple: true)
+# => "positive"
+
+# Custom categories
+RubyLLM::Text.sentiment("I'm excited about tomorrow!",
+  categories: ["excited", "calm", "worried", "neutral"])
+# => {"label" => "excited", "confidence" => 0.92}
+```
+
+### Key Points
+
+Extract main points from longer text.
+
+```ruby
+RubyLLM::Text.key_points(text, max_points: nil, format: :sentences, model: nil)
+```
+
+**Parameters:**
+
+- `text` (String): The text to extract points from
+- `max_points` (Integer, optional): Maximum number of points to extract
+- `format` (Symbol, optional): Output format (`:sentences`, `:bullets`, `:numbers`)
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+# Basic key points extraction
+meeting_notes = "We discussed budget, hiring, and marketing plans..."
+points = RubyLLM::Text.key_points(meeting_notes)
+# => ["Budget allocation reviewed", "New hiring plans discussed", ...]
+
+# Limit number of points
+RubyLLM::Text.key_points(text, max_points: 3)
+
+# Different formats
+RubyLLM::Text.key_points(text, format: :bullets)   # Returns clean text
+RubyLLM::Text.key_points(text, format: :numbers)   # Returns clean text
+RubyLLM::Text.key_points(text, format: :sentences) # Returns clean sentences
+```
+
+### Rewrite
+
+Transform text tone and style.
+
+```ruby
+RubyLLM::Text.rewrite(text, tone: nil, style: nil, instruction: nil, model: nil)
+```
+
+**Parameters:**
+
+- `text` (String): The text to rewrite
+- `tone` (Symbol|String, optional): Target tone (`:professional`, `:casual`, `:academic`, `:creative`)
+- `style` (Symbol|String, optional): Target style (`:concise`, `:detailed`, `:formal`)
+- `instruction` (String, optional): Custom rewriting instruction
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+# Change tone
+RubyLLM::Text.rewrite("hey whats up", tone: :professional)
+# => "Good morning. How are you doing?"
+
+# Change style
+RubyLLM::Text.rewrite("This is a long explanation...", style: :concise)
+# => "Brief explanation."
+
+# Custom instructions
+RubyLLM::Text.rewrite("Hello there", instruction: "make it sound like a pirate")
+# => "Ahoy there, matey!"
+
+# Combine multiple transformations
+RubyLLM::Text.rewrite(text, tone: :professional, style: :concise)
+```
+
+### Answer
+
+Answer questions based on provided text.
+
+```ruby
+RubyLLM::Text.answer(text, question, include_confidence: false, model: nil)
+```
+
+**Parameters:**
+
+- `text` (String): The text to search for answers
+- `question` (String): The question to answer
+- `include_confidence` (Boolean, optional): Include confidence score (default: false)
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+article = "Ruby was created by Yukihiro Matsumoto in 1995..."
+
+# Basic question answering
+RubyLLM::Text.answer(article, "Who created Ruby?")
+# => "Yukihiro Matsumoto"
+
+# Boolean questions
+RubyLLM::Text.answer(article, "Is Ruby a programming language?")
+# => true
+
+# With confidence scores
+result = RubyLLM::Text.answer(article, "When was Ruby created?", include_confidence: true)
+# => {"answer" => "1995", "confidence" => 0.98}
+
+# When answer not found
+RubyLLM::Text.answer(article, "What is Python?")
+# => "information not available"
 ```
 
 ## Configuration
@@ -213,10 +399,16 @@ RubyLLM::Text.configure do |config|
   config.translate_model = "claude-sonnet-4-5"  # Use Claude for translation
   config.extract_model = "gpt-4.1"              # Use GPT-4 for extraction
   config.classify_model = "gpt-4.1-mini"
+  config.grammar_model = "gpt-4.1-mini"         # Good for grammar correction
+  config.sentiment_model = "claude-haiku-4-5"   # Fast for sentiment analysis
+  config.key_points_model = "gpt-4.1-mini"      # Good for summarization tasks
+  config.rewrite_model = "gpt-4.1"              # Creative rewriting tasks
+  config.answer_model = "claude-sonnet-4-5"     # Strong reasoning for Q&A
 end
 ```
 
 **Per-call overrides:**
+
 ```ruby
 # Override model for specific calls
 RubyLLM::Text.summarize(text, model: "claude-sonnet-4-5")
@@ -237,6 +429,11 @@ require 'ruby_llm/text/string_ext'
 "Bonjour".translate(to: "en")
 "John is 30".extract(schema: { name: :string, age: :integer })
 "Great product!".classify(categories: ["positive", "negative"])
+"Their going to the stor".fix_grammar
+"I love this!".sentiment
+"Long meeting notes...".key_points(max_points: 3)
+"hey whats up".rewrite(tone: :professional)
+"Ruby was created in 1995".answer("When was Ruby created?")
 ```
 
 ## Integration with ruby_llm
@@ -254,11 +451,15 @@ The gem provides clear error messages for common issues:
 ```ruby
 # Missing required parameters
 RubyLLM::Text.extract("text")  # ArgumentError: schema is required
-
 RubyLLM::Text.classify("text", categories: [])  # ArgumentError: categories are required
+RubyLLM::Text.answer("text", nil)  # ArgumentError: question is required
+RubyLLM::Text.rewrite("text")  # ArgumentError: Must specify tone, style, or instruction
 
 # API errors are wrapped with context
 RubyLLM::Text.summarize("text")  # RubyLLM::Text::Error: LLM call failed: [original error]
+
+# Graceful fallbacks for parsing issues
+RubyLLM::Text.sentiment("text")  # Falls back to simple mode if JSON parsing fails
 ```
 
 ## Development
@@ -301,7 +502,7 @@ export ANTHROPIC_API_KEY="your-key"
 bin/manual-test
 ```
 
-This script tests all four methods with real LLM APIs and provides helpful output for verification.
+This script tests all nine methods with real LLM APIs and provides helpful output for verification.
 
 ## Contributing
 
