@@ -15,4 +15,24 @@ class String
   def classify(**options)
     RubyLLM::Text.classify(self, **options)
   end
+
+  def fix_grammar(**options)
+    RubyLLM::Text.fix_grammar(self, **options)
+  end
+
+  def sentiment(**options)
+    RubyLLM::Text.sentiment(self, **options)
+  end
+
+  def key_points(**options)
+    RubyLLM::Text.key_points(self, **options)
+  end
+
+  def rewrite(**options)
+    RubyLLM::Text.rewrite(self, **options)
+  end
+
+  def answer(question, **options)
+    RubyLLM::Text.answer(self, question, **options)
+  end
 end

@@ -1,4 +1,6 @@
 require "ruby_llm"
+require "ruby_llm/schema"
+require "json"
 require_relative "text/version"
 require_relative "text/configuration"
 require_relative "text/base"
@@ -6,6 +8,11 @@ require_relative "text/summarize"
 require_relative "text/translate"
 require_relative "text/extract"
 require_relative "text/classify"
+require_relative "text/grammar"
+require_relative "text/sentiment"
+require_relative "text/key_points"
+require_relative "text/rewrite"
+require_relative "text/answer"
 
 module RubyLLM
   module Text
@@ -34,6 +41,26 @@ module RubyLLM
 
       def classify(text, **options)
         Classify.call(text, **options)
+      end
+
+      def fix_grammar(text, **options)
+        Grammar.call(text, **options)
+      end
+
+      def sentiment(text, **options)
+        Sentiment.call(text, **options)
+      end
+
+      def key_points(text, **options)
+        KeyPoints.call(text, **options)
+      end
+
+      def rewrite(text, **options)
+        Rewrite.call(text, **options)
+      end
+
+      def answer(text, question, **options)
+        Answer.call(text, question, **options)
       end
     end
   end
