@@ -88,8 +88,8 @@ class RubyLLM::Text::KeyPointsTest < Minitest::Test
     RubyLLM::Text::Base.stubs(:call_llm).returns(response)
 
     result = RubyLLM::Text::KeyPoints.call(@long_text, format: :sentences)
-    # Should clean based on format parameter, not actual content
-    assert_equal [ "• First point with bullet", "2. Second point with number", "Third point plain" ], result
+    # Should clean all formatting markers for robust output regardless of format
+    assert_equal [ "First point with bullet", "Second point with number", "Third point plain" ], result
   end
 
   def test_defaults_to_sentences_format_for_unknown_format

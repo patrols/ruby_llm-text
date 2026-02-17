@@ -41,16 +41,12 @@ module RubyLLM
       def self.parse_response(response, format)
         lines = response.strip.split("\n").map(&:strip).reject(&:empty?)
 
-        # Clean up formatting markers if they exist
+        # Clean up formatting markers regardless of format for robust output
         lines.map do |line|
-          case format
-          when :bullets
-            line.gsub(/^[•\*\-]\s*/, "")
-          when :numbers
-            line.gsub(/^\d+\.\s*/, "")
-          else
-            line
-          end
+          # Always clean common formatting markers to handle LLM inconsistencies
+          cleaned = line.gsub(/^[•\*\-]\s*/, "")  # Remove bullets
+          cleaned = cleaned.gsub(/^\d+\.\s*/, "")  # Remove numbers
+          cleaned
         end
       end
     end
