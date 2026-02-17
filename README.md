@@ -459,7 +459,7 @@ RubyLLM::Text.rewrite("text")  # ArgumentError: Must specify at least one of: to
 RubyLLM::Text.summarize("text")  # RubyLLM::Text::Error: LLM call failed: [original error]
 
 # Graceful fallbacks for parsing issues
-RubyLLM::Text.sentiment("text")  # Falls back to simple mode if JSON parsing fails
+RubyLLM::Text.sentiment("text")  # Returns nil label/confidence with error and raw_response if JSON parsing fails
 ```
 
 ## Development
