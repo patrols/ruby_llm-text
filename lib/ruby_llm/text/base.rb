@@ -67,18 +67,32 @@ module RubyLLM
 
         # Handle JSON Schema-style hashes (e.g., {type: "object", properties: {...}})
         if schema[:type] == "object" && schema[:properties]
+          required_fields = schema[:required] || schema["required"] || []
+
           schema[:properties].each do |field, spec|
+            # Build constraint options
+            constraints = {}
+
+            # Handle required fields
+            constraints[:required] = required_fields.include?(field.to_s) || required_fields.include?(field)
+
+            # Extract constraints from spec
+            [ :enum, :minimum, :maximum ].each do |constraint|
+              value = spec[constraint] || spec[constraint.to_s]
+              constraints[constraint] = value if value
+            end
+
             # Handle oneOf union types - default to string for compatibility
             if spec[:oneOf]
-              schema_class.string field # Use string as most flexible type
+              schema_class.string field, **constraints # Use string as most flexible type
             else
               case spec[:type] || spec["type"]
               when "string"
-                schema_class.string field
+                schema_class.string field, **constraints
               when "number", "integer"
-                schema_class.number field
+                schema_class.number field, **constraints
               when "boolean"
-                schema_class.boolean field
+                schema_class.boolean field, **constraints
               when "array"
                 # Handle array with items specification
                 items_spec = spec[:items] || spec["items"]
@@ -86,19 +100,19 @@ module RubyLLM
                   items_type = items_spec[:type] || items_spec["type"]
                   case items_type
                   when "string"
-                    schema_class.array field, :string
+                    schema_class.array field, :string, **constraints
                   when "number", "integer"
-                    schema_class.array field, :number
+                    schema_class.array field, :number, **constraints
                   when "boolean"
-                    schema_class.array field, :boolean
+                    schema_class.array field, :boolean, **constraints
                   else
-                    schema_class.array field, :string
+                    schema_class.array field, :string, **constraints
                   end
                 else
-                  schema_class.array field, :string
+                  schema_class.array field, :string, **constraints
                 end
               else
-                schema_class.string field # fallback to string
+                schema_class.string field, **constraints # fallback to string
               end
             end
           end
