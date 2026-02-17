@@ -33,4 +33,18 @@ class StringExtensionsTest < Minitest::Test
     result = @text.classify(categories: [ "positive", "negative" ])
     assert_equal "positive", result
   end
+
+  def test_fix_grammar_delegates_to_text_fix_grammar
+    RubyLLM::Text.expects(:fix_grammar).with(@text, preserve_style: true).returns("corrected text")
+
+    result = @text.fix_grammar(preserve_style: true)
+    assert_equal "corrected text", result
+  end
+
+  def test_sentiment_delegates_to_text_sentiment
+    RubyLLM::Text.expects(:sentiment).with(@text, simple: true).returns("positive")
+
+    result = @text.sentiment(simple: true)
+    assert_equal "positive", result
+  end
 end

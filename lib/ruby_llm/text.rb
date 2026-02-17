@@ -6,6 +6,8 @@ require_relative "text/summarize"
 require_relative "text/translate"
 require_relative "text/extract"
 require_relative "text/classify"
+require_relative "text/grammar"
+require_relative "text/sentiment"
 
 module RubyLLM
   module Text
@@ -34,6 +36,14 @@ module RubyLLM
 
       def classify(text, **options)
         Classify.call(text, **options)
+      end
+
+      def fix_grammar(text, **options)
+        Grammar.call(text, **options)
+      end
+
+      def sentiment(text, **options)
+        Sentiment.call(text, **options)
       end
     end
   end
