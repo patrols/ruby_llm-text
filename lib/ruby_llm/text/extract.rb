@@ -13,7 +13,14 @@ module RubyLLM
       private
 
       def self.build_prompt(text, schema)
-        fields = schema.keys.join(", ")
+        # Support both simple field-hash schemas and JSON Schema-style hashes
+        properties = schema[:properties] || schema["properties"] if schema.respond_to?(:[])
+        field_keys = if properties.is_a?(Hash)
+                       properties.keys
+        else
+                       schema.keys
+        end
+        fields = field_keys.join(", ")
 
         <<~PROMPT
           Extract the following information from the text: #{fields}
