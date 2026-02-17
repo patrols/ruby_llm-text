@@ -36,9 +36,27 @@ module RubyLLM
 
         # If still no JSON, try to extract JSON from mixed content
         if !cleaned.start_with?("{") && cleaned.include?("{")
-          # Find JSON object in the response
-          json_match = cleaned.match(/\{[^}]*\}/m)
-          cleaned = json_match[0] if json_match
+          # Find JSON object in the response with proper brace matching
+          brace_count = 0
+          start_pos = cleaned.index("{")
+          if start_pos
+            end_pos = start_pos
+            cleaned[start_pos..-1].each_char.with_index(start_pos) do |char, i|
+              if char == "{"
+                brace_count += 1
+              elsif char == "}"
+                brace_count -= 1
+                if brace_count == 0
+                  end_pos = i
+                  break
+                end
+              end
+            end
+
+            if brace_count == 0
+              cleaned = cleaned[start_pos..end_pos]
+            end
+          end
         end
 
         cleaned
