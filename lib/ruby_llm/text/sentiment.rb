@@ -1,7 +1,7 @@
 module RubyLLM
   module Text
     module Sentiment
-      DEFAULT_CATEGORIES = ["positive", "negative", "neutral"].freeze
+      DEFAULT_CATEGORIES = [ "positive", "negative", "neutral" ].freeze
 
       def self.call(text, categories: DEFAULT_CATEGORIES, simple: false, model: nil, **options)
         model ||= RubyLLM::Text.config.model_for(:sentiment)
@@ -18,7 +18,7 @@ module RubyLLM
               label: { type: "string", enum: categories },
               confidence: { type: "number", minimum: 0, maximum: 1 }
             },
-            required: ["label", "confidence"]
+            required: [ "label", "confidence" ]
           }
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
           result = JSON.parse(response)

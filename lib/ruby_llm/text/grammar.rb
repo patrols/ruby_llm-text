@@ -17,7 +17,7 @@ module RubyLLM
                 items: { type: "string" }
               }
             },
-            required: ["corrected", "changes"]
+            required: [ "corrected", "changes" ]
           }
           response = Base.call_llm(prompt, model: model, schema: schema, **options)
           JSON.parse(response)

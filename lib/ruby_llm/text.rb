@@ -8,6 +8,9 @@ require_relative "text/extract"
 require_relative "text/classify"
 require_relative "text/grammar"
 require_relative "text/sentiment"
+require_relative "text/key_points"
+require_relative "text/rewrite"
+require_relative "text/answer"
 
 module RubyLLM
   module Text
@@ -44,6 +47,18 @@ module RubyLLM
 
       def sentiment(text, **options)
         Sentiment.call(text, **options)
+      end
+
+      def key_points(text, **options)
+        KeyPoints.call(text, **options)
+      end
+
+      def rewrite(text, **options)
+        Rewrite.call(text, **options)
+      end
+
+      def answer(text, question, **options)
+        Answer.call(text, question, **options)
       end
     end
   end

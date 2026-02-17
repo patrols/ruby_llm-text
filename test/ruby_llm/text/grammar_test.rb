@@ -17,7 +17,7 @@ class RubyLLM::Text::GrammarTest < Minitest::Test
   def test_returns_structured_output_when_explain_is_true
     explanation_response = {
       "corrected" => @corrected_text,
-      "changes" => ["Their → They're", "stor → store", "tommorow → tomorrow"]
+      "changes" => [ "Their → They're", "stor → store", "tommorow → tomorrow" ]
     }.to_json
 
     RubyLLM::Text::Base.stubs(:call_llm).returns(explanation_response)
@@ -65,7 +65,7 @@ class RubyLLM::Text::GrammarTest < Minitest::Test
   def test_passes_schema_when_explain_is_true
     explanation_response = {
       "corrected" => @corrected_text,
-      "changes" => ["Their → They're"]
+      "changes" => [ "Their → They're" ]
     }.to_json
 
     # Just verify it gets called with a schema parameter

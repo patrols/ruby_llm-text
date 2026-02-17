@@ -36,21 +36,21 @@ class RubyLLM::Text::SentimentTest < Minitest::Test
   end
 
   def test_uses_custom_categories_when_specified
-    custom_categories = ["happy", "sad", "angry"]
+    custom_categories = [ "happy", "sad", "angry" ]
     prompt = RubyLLM::Text::Sentiment.send(:build_prompt, @positive_text, categories: custom_categories, simple: false)
     assert_includes prompt, "happy, sad, angry"
     refute_includes prompt, "positive"
   end
 
   def test_includes_json_instruction_when_not_simple
-    prompt = RubyLLM::Text::Sentiment.send(:build_prompt, @positive_text, categories: ["positive", "negative"], simple: false)
+    prompt = RubyLLM::Text::Sentiment.send(:build_prompt, @positive_text, categories: [ "positive", "negative" ], simple: false)
     assert_includes prompt, "JSON object"
     assert_includes prompt, "label"
     assert_includes prompt, "confidence"
   end
 
   def test_requests_simple_output_when_simple_is_true
-    prompt = RubyLLM::Text::Sentiment.send(:build_prompt, @positive_text, categories: ["positive", "negative"], simple: true)
+    prompt = RubyLLM::Text::Sentiment.send(:build_prompt, @positive_text, categories: [ "positive", "negative" ], simple: true)
     assert_includes prompt, "Return only the sentiment category name"
     refute_includes prompt, "JSON"
   end
@@ -95,7 +95,7 @@ class RubyLLM::Text::SentimentTest < Minitest::Test
   end
 
   def test_handles_different_sentiment_categories
-    categories = ["excited", "calm", "frustrated"]
+    categories = [ "excited", "calm", "frustrated" ]
     prompt = RubyLLM::Text::Sentiment.send(:build_prompt, @positive_text, categories: categories, simple: false)
 
     categories.each do |category|
