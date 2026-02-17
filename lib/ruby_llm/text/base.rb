@@ -7,7 +7,11 @@ module RubyLLM
 
         chat = RubyLLM.chat(model: model)
         chat = chat.with_temperature(temperature)
-        chat = chat.with_schema(schema) if schema
+        if schema
+          # Convert plain Hash schemas to RubyLLM::Schema objects if needed
+          schema_obj = build_schema(schema)
+          chat = chat.with_schema(schema_obj)
+        end
 
         # Apply any additional options
         options.each do |key, value|
@@ -51,6 +55,58 @@ module RubyLLM
         end
 
         cleaned
+      end
+
+      def self.build_schema(schema)
+        # If already a schema object, return as-is
+        return schema if schema.respond_to?(:schema)
+
+        # If it's a Hash, convert it to RubyLLM::Schema
+        if schema.is_a?(Hash)
+          # For JSON Schema-like hashes, create a dynamic schema class
+          schema_class = Class.new(RubyLLM::Schema)
+          if schema[:type] == "object" && schema[:properties]
+            schema[:properties].each do |field, spec|
+              # Handle oneOf union types - default to string for compatibility
+              if spec[:oneOf]
+                schema_class.string field # Use string as most flexible type
+              else
+                case spec[:type] || spec["type"]
+                when "string"
+                  schema_class.string field
+                when "number", "integer"
+                  schema_class.number field
+                when "boolean"
+                  schema_class.boolean field
+                when "array"
+                  # Handle array with items specification
+                  items_spec = spec[:items] || spec["items"]
+                  if items_spec
+                    items_type = items_spec[:type] || items_spec["type"]
+                    case items_type
+                    when "string"
+                      schema_class.array field, :string
+                    when "number", "integer"
+                      schema_class.array field, :number
+                    when "boolean"
+                      schema_class.array field, :boolean
+                    else
+                      schema_class.array field, :string
+                    end
+                  else
+                    schema_class.array field, :string
+                  end
+                else
+                  schema_class.string field # fallback to string
+                end
+              end
+            end
+          end
+          return schema_class
+        end
+
+        # Return as-is if we don't know how to convert it
+        schema
       end
     end
 

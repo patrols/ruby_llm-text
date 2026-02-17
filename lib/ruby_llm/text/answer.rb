@@ -68,10 +68,17 @@ module RubyLLM
       end
 
       def self.build_confidence_schema(question)
+        # For boolean questions, allow both boolean and string types
+        # to handle "information not available" fallback
         answer_type = if is_boolean_question?(question)
-          { "type" => "boolean" }
+          {
+            oneOf: [
+              { type: "boolean" },
+              { type: "string" }
+            ]
+          }
         else
-          { "type" => "string" }
+          { type: "string" }
         end
 
         {

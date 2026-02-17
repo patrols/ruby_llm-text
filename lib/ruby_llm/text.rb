@@ -1,4 +1,5 @@
 require "ruby_llm"
+require "ruby_llm/schema"
 require "json"
 require_relative "text/version"
 require_relative "text/configuration"

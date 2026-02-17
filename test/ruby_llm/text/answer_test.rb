@@ -159,11 +159,14 @@ class RubyLLM::Text::AnswerTest < Minitest::Test
 
   def test_builds_boolean_schema_for_boolean_questions
     schema = RubyLLM::Text::Answer.send(:build_confidence_schema, "Is this about astronomy?")
-    assert_equal "boolean", schema[:properties][:answer]["type"]
+    # Boolean questions now use oneOf to allow both boolean and string types
+    assert schema[:properties][:answer][:oneOf]
+    assert_includes schema[:properties][:answer][:oneOf], { type: "boolean" }
+    assert_includes schema[:properties][:answer][:oneOf], { type: "string" }
   end
 
   def test_builds_string_schema_for_factual_questions
     schema = RubyLLM::Text::Answer.send(:build_confidence_schema, "What does Earth orbit?")
-    assert_equal "string", schema[:properties][:answer]["type"]
+    assert_equal "string", schema[:properties][:answer][:type]
   end
 end
