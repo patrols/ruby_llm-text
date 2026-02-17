@@ -38,12 +38,12 @@ class RubyLLM::Text::ExtractTest < Minitest::Test
   end
 
   def test_handles_string_fields_in_schema_building
-    schema_class = RubyLLM::Text::Extract.send(:build_schema, { name: :string })
+    schema_class = RubyLLM::Text::Base.build_schema({ name: :string })
     assert_respond_to schema_class, :new
   end
 
   def test_handles_number_fields_in_schema_building
-    schema_class = RubyLLM::Text::Extract.send(:build_schema, { age: :integer })
+    schema_class = RubyLLM::Text::Base.build_schema({ age: :integer })
     assert_respond_to schema_class, :new
   end
 
@@ -54,7 +54,7 @@ class RubyLLM::Text::ExtractTest < Minitest::Test
       method == :schema
     end
 
-    result = RubyLLM::Text::Extract.send(:build_schema, existing_schema)
+    result = RubyLLM::Text::Base.build_schema(existing_schema)
     assert_equal existing_schema, result
   end
 end

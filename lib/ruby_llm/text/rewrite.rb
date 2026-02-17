@@ -6,14 +6,14 @@ module RubyLLM
         professional: "business-appropriate, formal, and polished",
         academic: "scholarly, formal, and precise",
         creative: "engaging, descriptive, and imaginative",
-        concise: "brief, direct, and to-the-point"
+        brief: "brief, direct, and to-the-point"
       }.freeze
 
       STYLES = {
         concise: "Make it shorter and more direct while preserving meaning",
         detailed: "Expand with more context, examples, and explanation",
         formal: "Use formal language and professional terminology",
-        casual: "Use informal, friendly language"
+        informal: "Use informal, friendly language"
       }.freeze
 
       def self.call(text, tone: nil, style: nil, instruction: nil, model: nil, **options)

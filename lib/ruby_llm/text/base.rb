@@ -61,52 +61,66 @@ module RubyLLM
         # If already a schema object, return as-is
         return schema if schema.respond_to?(:schema)
 
-        # If it's a Hash, convert it to RubyLLM::Schema
-        if schema.is_a?(Hash)
-          # For JSON Schema-like hashes, create a dynamic schema class
-          schema_class = Class.new(RubyLLM::Schema)
-          if schema[:type] == "object" && schema[:properties]
-            schema[:properties].each do |field, spec|
-              # Handle oneOf union types - default to string for compatibility
-              if spec[:oneOf]
-                schema_class.string field # Use string as most flexible type
-              else
-                case spec[:type] || spec["type"]
-                when "string"
-                  schema_class.string field
-                when "number", "integer"
-                  schema_class.number field
-                when "boolean"
-                  schema_class.boolean field
-                when "array"
-                  # Handle array with items specification
-                  items_spec = spec[:items] || spec["items"]
-                  if items_spec
-                    items_type = items_spec[:type] || items_spec["type"]
-                    case items_type
-                    when "string"
-                      schema_class.array field, :string
-                    when "number", "integer"
-                      schema_class.array field, :number
-                    when "boolean"
-                      schema_class.array field, :boolean
-                    else
-                      schema_class.array field, :string
-                    end
+        return nil unless schema.is_a?(Hash)
+
+        schema_class = Class.new(RubyLLM::Schema)
+
+        # Handle JSON Schema-style hashes (e.g., {type: "object", properties: {...}})
+        if schema[:type] == "object" && schema[:properties]
+          schema[:properties].each do |field, spec|
+            # Handle oneOf union types - default to string for compatibility
+            if spec[:oneOf]
+              schema_class.string field # Use string as most flexible type
+            else
+              case spec[:type] || spec["type"]
+              when "string"
+                schema_class.string field
+              when "number", "integer"
+                schema_class.number field
+              when "boolean"
+                schema_class.boolean field
+              when "array"
+                # Handle array with items specification
+                items_spec = spec[:items] || spec["items"]
+                if items_spec
+                  items_type = items_spec[:type] || items_spec["type"]
+                  case items_type
+                  when "string"
+                    schema_class.array field, :string
+                  when "number", "integer"
+                    schema_class.array field, :number
+                  when "boolean"
+                    schema_class.array field, :boolean
                   else
                     schema_class.array field, :string
                   end
                 else
-                  schema_class.string field # fallback to string
+                  schema_class.array field, :string
                 end
+              else
+                schema_class.string field # fallback to string
               end
             end
           end
-          return schema_class
+        else
+          # Handle simple symbol-based schemas (e.g., {name: :string, age: :integer})
+          schema.each do |field, type|
+            case type
+            when :string
+              schema_class.string field
+            when :integer, :number
+              schema_class.number field
+            when :boolean
+              schema_class.boolean field
+            when :array
+              schema_class.array field
+            else
+              schema_class.string field # fallback to string
+            end
+          end
         end
 
-        # Return as-is if we don't know how to convert it
-        schema
+        schema_class
       end
     end
 

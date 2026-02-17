@@ -313,8 +313,8 @@ RubyLLM::Text.rewrite(text, tone: nil, style: nil, instruction: nil, model: nil)
 **Parameters:**
 
 - `text` (String): The text to rewrite
-- `tone` (Symbol|String, optional): Target tone (`:professional`, `:casual`, `:academic`, `:creative`)
-- `style` (Symbol|String, optional): Target style (`:concise`, `:detailed`, `:formal`)
+- `tone` (Symbol|String, optional): Target tone (`:professional`, `:casual`, `:academic`, `:creative`, `:brief`)
+- `style` (Symbol|String, optional): Target style (`:concise`, `:detailed`, `:formal`, `:informal`)
 - `instruction` (String, optional): Custom rewriting instruction
 - `model` (String, optional): Specific model to use
 
