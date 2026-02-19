@@ -63,7 +63,14 @@ module RubyLLM
             Focus on tracking edits and revisions between the versions.
           INSTRUCTION
         else
-          comparison_instruction = build_prompt(text1, text2, comparison_type: :similarity)
+          comparison_instruction = <<~INSTRUCTION
+            Compare the two texts and provide:
+            - A similarity score from 0 to 1 (where 1 is identical and 0 is completely different)
+            - The type of similarity detected (semantic, structural, topical, etc.)
+            - A brief summary of what makes them similar or different
+
+            Focus on semantic similarity - texts with the same meaning should score high even if worded differently.
+          INSTRUCTION
         end
 
         <<~PROMPT
