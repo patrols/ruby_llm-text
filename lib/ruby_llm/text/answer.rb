@@ -2,8 +2,8 @@ module RubyLLM
   module Text
     module Answer
       def self.call(text, question, include_confidence: false, model: nil, **options)
-        raise ArgumentError, "question is required" if question.nil? || question.strip.empty?
-
+        Validation.validate_text!(text)
+        Validation.validate_text!(question, param_name: "question")
         model ||= RubyLLM::Text.config.model_for(:answer)
 
         prompt = build_prompt(text, question, include_confidence: include_confidence)

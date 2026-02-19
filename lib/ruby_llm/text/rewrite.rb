@@ -17,12 +17,9 @@ module RubyLLM
       }.freeze
 
       def self.call(text, tone: nil, style: nil, instruction: nil, model: nil, **options)
+        Validation.validate_text!(text)
+        Validation.validate_one_of!({ tone: tone, style: style, instruction: instruction }, %w[tone style instruction])
         model ||= RubyLLM::Text.config.model_for(:rewrite)
-
-        # Validate that at least one transformation is specified
-        if tone.nil? && style.nil? && instruction.nil?
-          raise ArgumentError, "Must specify at least one of: tone, style, or instruction"
-        end
 
         prompt = build_prompt(text, tone: tone, style: style, instruction: instruction)
         Base.call_llm(prompt, model: model, **options)

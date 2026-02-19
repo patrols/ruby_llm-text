@@ -35,4 +35,20 @@ class String
   def answer(question, **options)
     RubyLLM::Text.answer(self, question, **options)
   end
+
+  def detect_language(**options)
+    RubyLLM::Text.detect_language(self, **options)
+  end
+
+  def generate_tags(**options)
+    RubyLLM::Text.generate_tags(self, **options)
+  end
+
+  def anonymize(**options)
+    RubyLLM::Text.anonymize(self, **options)
+  end
+
+  def compare(other_text, **options)
+    RubyLLM::Text.compare(self, other_text, **options)
+  end
 end

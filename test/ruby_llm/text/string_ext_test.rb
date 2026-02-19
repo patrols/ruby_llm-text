@@ -69,4 +69,33 @@ class StringExtensionsTest < Minitest::Test
     result = @text.answer(question, include_confidence: true)
     assert_equal({ "answer" => "testing", "confidence" => 0.9 }, result)
   end
+
+  def test_detect_language_delegates_to_text_detect_language
+    RubyLLM::Text.expects(:detect_language).with(@text, include_confidence: false).returns("English")
+
+    result = @text.detect_language(include_confidence: false)
+    assert_equal "English", result
+  end
+
+  def test_generate_tags_delegates_to_text_generate_tags
+    RubyLLM::Text.expects(:generate_tags).with(@text, max_tags: 5, style: :keywords).returns([ "tag1", "tag2" ])
+
+    result = @text.generate_tags(max_tags: 5, style: :keywords)
+    assert_equal [ "tag1", "tag2" ], result
+  end
+
+  def test_anonymize_delegates_to_text_anonymize
+    RubyLLM::Text.expects(:anonymize).with(@text, pii_types: [ :emails ], include_mapping: false).returns("anonymized text")
+
+    result = @text.anonymize(pii_types: [ :emails ], include_mapping: false)
+    assert_equal "anonymized text", result
+  end
+
+  def test_compare_delegates_to_text_compare_with_other_text
+    other_text = "Another text to compare"
+    RubyLLM::Text.expects(:compare).with(@text, other_text, comparison_type: :detailed).returns({ "similarity" => 0.8 })
+
+    result = @text.compare(other_text, comparison_type: :detailed)
+    assert_equal({ "similarity" => 0.8 }, result)
+  end
 end

@@ -7,7 +7,7 @@ ActiveSupport-style LLM utilities for Ruby that make AI operations feel like nat
 
 ## Overview
 
-`ruby_llm-text` provides intuitive one-liner utility methods for common LLM tasks including text summarization, translation, data extraction, classification, grammar correction, sentiment analysis, key point extraction, text rewriting, and question answering. It integrates seamlessly with the [ruby_llm](https://github.com/crmne/ruby_llm) ecosystem, providing a simple interface without requiring chat objects, message arrays, or configuration boilerplate.
+`ruby_llm-text` provides intuitive one-liner utility methods for common LLM tasks including text summarization, translation, data extraction, classification, grammar correction, sentiment analysis, key point extraction, text rewriting, question answering, language detection, tag generation, PII anonymization, and text comparison. It integrates seamlessly with the [ruby_llm](https://github.com/crmne/ruby_llm) ecosystem, providing a simple interface without requiring chat objects, message arrays, or configuration boilerplate.
 
 ## Installation
 
@@ -374,6 +374,168 @@ RubyLLM::Text.answer(article, "What is Python?")
 # => "information not available"
 ```
 
+### Detect Language
+
+Identify the language of text.
+
+```ruby
+RubyLLM::Text.detect_language(text, include_confidence: false, model: nil)
+```
+
+**Parameters:**
+
+- `text` (String): The text to analyze
+- `include_confidence` (Boolean, optional): Return language code and confidence score (default: false)
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+# Basic language detection
+RubyLLM::Text.detect_language("Bonjour le monde")
+# => "French"
+
+# With confidence and language code
+RubyLLM::Text.detect_language("Hello world", include_confidence: true)
+# => {"language" => "English", "confidence" => 0.98, "code" => "en"}
+
+# Mixed or ambiguous text
+RubyLLM::Text.detect_language("Hola hello bonjour")
+# => "Spanish" (or may return "unknown" for highly mixed text)
+```
+
+### Generate Tags
+
+Extract relevant tags and keywords from text.
+
+```ruby
+RubyLLM::Text.generate_tags(text, max_tags: nil, style: :keywords, model: nil)
+```
+
+**Parameters:**
+
+- `text` (String): The text to extract tags from
+- `max_tags` (Integer, optional): Maximum number of tags to generate
+- `style` (Symbol, optional): Tag style (`:keywords`, `:topics`, `:hashtags`)
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+# Basic tag generation
+article = "Ruby is a dynamic programming language focused on simplicity..."
+RubyLLM::Text.generate_tags(article)
+# => ["ruby", "programming", "dynamic language", "simplicity"]
+
+# Limit number of tags
+RubyLLM::Text.generate_tags(article, max_tags: 3)
+# => ["ruby", "programming", "dynamic language"]
+
+# Topic-style tags (broader categories)
+RubyLLM::Text.generate_tags(article, style: :topics)
+# => ["Programming Languages", "Software Development", "Technology"]
+
+# Hashtag-style for social media
+RubyLLM::Text.generate_tags(article, style: :hashtags)
+# => ["#ruby", "#programming", "#coding", "#developer"]
+```
+
+### Anonymize
+
+Remove or replace personally identifiable information (PII) from text.
+
+```ruby
+RubyLLM::Text.anonymize(text, pii_types: [:names, :emails, :phones, :addresses], replacement_style: :generic, include_mapping: false, model: nil)
+```
+
+**Parameters:**
+
+- `text` (String): The text to anonymize
+- `pii_types` (Array, optional): Types of PII to detect (`:names`, `:emails`, `:phones`, `:addresses`, `:ssn`, `:credit_cards`)
+- `replacement_style` (Symbol, optional): How to format replacements (`:generic`, `:numbered`, `:descriptive`)
+- `include_mapping` (Boolean, optional): Return mapping of replacements to original values (default: false)
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+# Basic anonymization
+text = "Contact John Smith at john@example.com or 555-123-4567"
+RubyLLM::Text.anonymize(text)
+# => "Contact [PERSON] at [EMAIL] or [PHONE]"
+
+# With numbered replacements for multiple entities
+text = "John and Jane work at 123 Main St"
+RubyLLM::Text.anonymize(text, replacement_style: :numbered)
+# => "[PERSON_1] and [PERSON_2] work at [ADDRESS_1]"
+
+# Get mapping of replacements
+result = RubyLLM::Text.anonymize(text, include_mapping: true)
+# => {
+#      "text" => "Contact [PERSON_1] at [EMAIL_1]",
+#      "mapping" => {
+#        "[PERSON_1]" => "John Smith",
+#        "[EMAIL_1]" => "john@example.com"
+#      }
+#    }
+
+# Selective PII types
+RubyLLM::Text.anonymize(text, pii_types: [:emails, :phones])
+# => "Contact John Smith at [EMAIL] or [PHONE]"
+```
+
+### Compare
+
+Compare two texts for similarity and differences.
+
+```ruby
+RubyLLM::Text.compare(text1, text2, comparison_type: :similarity, model: nil)
+```
+
+**Parameters:**
+
+- `text1` (String): The first text to compare
+- `text2` (String): The second text to compare
+- `comparison_type` (Symbol, optional): Type of comparison (`:similarity`, `:detailed`, `:changes`)
+- `model` (String, optional): Specific model to use
+
+**Examples:**
+
+```ruby
+# Basic similarity comparison
+text1 = "The quick brown fox jumps over the lazy dog"
+text2 = "A fast brown fox leaps over a sleepy dog"
+RubyLLM::Text.compare(text1, text2)
+# => {
+#      "similarity" => 0.85,
+#      "comparison_type" => "similarity",
+#      "similarity_type" => "semantic",
+#      "summary" => "Both texts describe a fox jumping over a dog..."
+#    }
+
+# Detailed comparison
+RubyLLM::Text.compare(text1, text2, comparison_type: :detailed)
+# => {
+#      "similarity" => 0.85,
+#      "comparison_type" => "detailed",
+#      "differences" => ["Word choice varies", "Adjectives differ"],
+#      "commonalities" => ["Same basic action", "Same subjects"],
+#      "summary" => "The texts convey the same meaning with different wording"
+#    }
+
+# Track changes between versions
+original = "Our product costs $99 and ships in 3 days"
+revised = "Our product costs $79 and ships in 2 days"
+RubyLLM::Text.compare(original, revised, comparison_type: :changes)
+# => {
+#      "similarity" => 0.90,
+#      "comparison_type" => "changes",
+#      "change_types" => ["modification"],
+#      "examples" => ["Price changed from $99 to $79", "Shipping time reduced"],
+#      "assessment" => "Minor updates to pricing and shipping information"
+#    }
+```
+
 ## Configuration
 
 This gem uses `ruby_llm`'s configuration for API keys and default models:
@@ -404,6 +566,10 @@ RubyLLM::Text.configure do |config|
   config.key_points_model = "gpt-4.1-mini"      # Good for summarization tasks
   config.rewrite_model = "gpt-4.1"              # Creative rewriting tasks
   config.answer_model = "claude-sonnet-4-5"     # Strong reasoning for Q&A
+  config.detect_language_model = "gpt-4.1-mini" # Fast language detection
+  config.generate_tags_model = "gpt-4.1-mini"   # Good for keyword extraction
+  config.anonymize_model = "gpt-4.1"            # Accurate PII detection
+  config.compare_model = "claude-sonnet-4-5"    # Strong for nuanced comparison
 end
 ```
 
@@ -434,6 +600,10 @@ require 'ruby_llm/text/string_ext'
 "Long meeting notes...".key_points(max_points: 3)
 "hey whats up".rewrite(tone: :professional)
 "Ruby was created in 1995".answer("When was Ruby created?")
+"Bonjour le monde".detect_language
+"Long article about Ruby...".generate_tags(max_tags: 5)
+"Contact John at john@example.com".anonymize
+"Text A".compare("Text B")
 ```
 
 ## Integration with ruby_llm
@@ -502,7 +672,7 @@ export ANTHROPIC_API_KEY="your-key"
 bin/manual-test
 ```
 
-This script tests all nine methods with real LLM APIs and provides helpful output for verification.
+This script tests all methods with real LLM APIs and provides helpful output for verification.
 
 ## Contributing
 

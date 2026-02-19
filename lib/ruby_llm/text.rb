@@ -4,6 +4,7 @@ require "json"
 require_relative "text/version"
 require_relative "text/configuration"
 require_relative "text/base"
+require_relative "text/validation"
 require_relative "text/summarize"
 require_relative "text/translate"
 require_relative "text/extract"
@@ -13,6 +14,10 @@ require_relative "text/sentiment"
 require_relative "text/key_points"
 require_relative "text/rewrite"
 require_relative "text/answer"
+require_relative "text/detect_language"
+require_relative "text/generate_tags"
+require_relative "text/anonymize"
+require_relative "text/compare"
 
 module RubyLLM
   module Text
@@ -61,6 +66,22 @@ module RubyLLM
 
       def answer(text, question, **options)
         Answer.call(text, question, **options)
+      end
+
+      def detect_language(text, **options)
+        DetectLanguage.call(text, **options)
+      end
+
+      def generate_tags(text, **options)
+        GenerateTags.call(text, **options)
+      end
+
+      def anonymize(text, **options)
+        Anonymize.call(text, **options)
+      end
+
+      def compare(text1, text2, **options)
+        Compare.call(text1, text2, **options)
       end
     end
   end

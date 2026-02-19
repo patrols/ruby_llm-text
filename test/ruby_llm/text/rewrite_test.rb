@@ -29,7 +29,7 @@ class RubyLLM::Text::RewriteTest < Minitest::Test
   end
 
   def test_raises_error_when_no_transformation_specified
-    assert_raises(ArgumentError) do
+    assert_raises(RubyLLM::Text::Validation::ValidationError) do
       RubyLLM::Text::Rewrite.call(@casual_text)
     end
   end

@@ -15,10 +15,10 @@ class RubyLLM::Text::ClassifyTest < Minitest::Test
   end
 
   def test_raises_error_when_categories_are_empty
-    error = assert_raises(ArgumentError) do
+    error = assert_raises(RubyLLM::Text::Validation::ValidationError) do
       RubyLLM::Text::Classify.call(@text, categories: [])
     end
-    assert_equal "categories are required", error.message
+    assert_equal "categories must have at least 1 element(s)", error.message
   end
 
   def test_builds_correct_prompt_with_category_list

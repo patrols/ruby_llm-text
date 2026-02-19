@@ -4,7 +4,8 @@ module RubyLLM
       # Method-specific model overrides (optional)
       # If not set, falls back to RubyLLM.config.default_model
       attr_accessor :summarize_model, :translate_model,
-                    :extract_model, :classify_model, :grammar_model, :sentiment_model, :key_points_model, :rewrite_model, :answer_model
+                    :extract_model, :classify_model, :grammar_model, :sentiment_model, :key_points_model, :rewrite_model, :answer_model,
+                    :detect_language_model, :generate_tags_model, :anonymize_model, :compare_model
 
       # Default temperature for text operations
       attr_accessor :temperature
@@ -20,6 +21,10 @@ module RubyLLM
         @key_points_model = nil
         @rewrite_model = nil
         @answer_model = nil
+        @detect_language_model = nil
+        @generate_tags_model = nil
+        @anonymize_model = nil
+        @compare_model = nil
       end
 
       def model_for(method_name)

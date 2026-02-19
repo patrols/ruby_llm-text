@@ -2,8 +2,9 @@ module RubyLLM
   module Text
     module Extract
       def self.call(text, schema: nil, model: nil, **options)
+        Validation.validate_text!(text)
+        Validation.validate_required!(schema, "schema")
         model ||= RubyLLM::Text.config.model_for(:extract)
-        raise ArgumentError, "schema is required for extraction" unless schema
 
         prompt = build_prompt(text, schema)
 
