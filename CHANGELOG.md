@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-02-19
+
+### Added
+- **Phase 3 Text Operations** - Four new methods for expanded text processing:
+  - `detect_language` - Identify the language of text with optional confidence scores and ISO codes
+  - `generate_tags` - Extract relevant tags/keywords with style options (keywords, topics, hashtags)
+  - `anonymize` - Remove or replace PII (names, emails, phones, addresses, SSN, credit cards) with configurable replacement styles
+  - `compare` - Compare two texts for similarity with detailed analysis options (similarity, detailed, changes)
+- **Input Validation** - New `Validation` module providing consistent, helpful error messages across all operations
+- **Extended String Extensions** - All Phase 3 methods available as String monkey-patches
+- **Comprehensive Test Coverage** - Full test suites for all new operations and validation
+
+### Improved
+- **Error Messages** - Clear, actionable error messages for invalid inputs
+- **Test Coverage** - Expanded test suite covering all 13 methods
+
 ## [0.2.0] - 2025-02-17
 
 ### Added
@@ -51,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ruby_llm ~> 1.0 (core dependency)
 - Ruby >= 3.2.0
 
-[Unreleased]: https://github.com/patrols/ruby_llm-text/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/patrols/ruby_llm-text/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/patrols/ruby_llm-text/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/patrols/ruby_llm-text/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/patrols/ruby_llm-text/releases/tag/v0.1.0
