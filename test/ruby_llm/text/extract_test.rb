@@ -15,10 +15,10 @@ class RubyLLM::Text::ExtractTest < Minitest::Test
   end
 
   def test_raises_error_when_schema_is_missing
-    error = assert_raises(ArgumentError) do
+    error = assert_raises(RubyLLM::Text::Validation::ValidationError) do
       RubyLLM::Text::Extract.call(@text)
     end
-    assert_equal "schema is required for extraction", error.message
+    assert_equal "schema is required", error.message
   end
 
   def test_builds_correct_prompt_with_schema_fields

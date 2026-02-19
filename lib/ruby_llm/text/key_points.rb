@@ -2,6 +2,7 @@ module RubyLLM
   module Text
     module KeyPoints
       def self.call(text, max_points: nil, format: :sentences, model: nil, **options)
+        Validation.validate_text!(text)
         model ||= RubyLLM::Text.config.model_for(:key_points)
 
         prompt = build_prompt(text, max_points: max_points, format: format)

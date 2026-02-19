@@ -155,8 +155,64 @@ end
 
 puts "\n" + "="*50 + "\n"
 
-# Test 10: String extensions (if available)
-puts "🔟 Testing string extensions..."
+# Test 10: Detect Language (Phase 3)
+puts "🔟 Testing detect_language..."
+begin
+  language = RubyLLM::Text.detect_language("Bonjour, comment allez-vous?")
+  language_with_confidence = RubyLLM::Text.detect_language("Hola, ¿cómo estás?", include_confidence: true)
+  puts "   ✅ French text detected: #{language}"
+  puts "   ✅ Spanish with confidence: #{language_with_confidence}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 11: Generate Tags (Phase 3)
+puts "1️⃣1️⃣ Testing generate_tags..."
+begin
+  tags = RubyLLM::Text.generate_tags(article, max_tags: 5)
+  hashtags = RubyLLM::Text.generate_tags(article, style: :hashtags, max_tags: 3)
+  puts "   ✅ Article tags: #{tags.join(', ')}"
+  puts "   ✅ Hashtags: #{hashtags.join(' ')}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 12: Anonymize (Phase 3)
+pii_text = "Contact John Smith at john.smith@email.com or call 555-123-4567. He lives at 123 Main St, Boston."
+puts "1️⃣2️⃣ Testing anonymize..."
+begin
+  anonymized = RubyLLM::Text.anonymize(pii_text)
+  anonymized_with_mapping = RubyLLM::Text.anonymize(pii_text, include_mapping: true)
+  puts "   ✅ Original: #{pii_text}"
+  puts "   🔒 Anonymized: #{anonymized}"
+  puts "   🔒 With mapping: #{anonymized_with_mapping}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 13: Compare (Phase 3)
+text_a = "Ruby is a dynamic programming language focused on simplicity."
+text_b = "Ruby is an interpreted language that emphasizes developer productivity."
+puts "1️⃣3️⃣ Testing compare..."
+begin
+  comparison = RubyLLM::Text.compare(text_a, text_b)
+  puts "   ✅ Text A: #{text_a}"
+  puts "   ✅ Text B: #{text_b}"
+  puts "   📊 Comparison: #{comparison}"
+rescue => e
+  puts "   ❌ Error: #{e.message}"
+end
+
+puts "\n" + "="*50 + "\n"
+
+# Test 14: String extensions (if available)
+puts "1️⃣4️⃣ Testing string extensions..."
 begin
   require 'ruby_llm/text/string_ext'
 
@@ -170,13 +226,20 @@ begin
   puts "   ✅ Phase 2 extensions work!"
   puts "   🔧 Grammar: #{corrected_ext}"
   puts "   😊 Sentiment: #{sentiment_ext}"
+
+  # Test Phase 3 extensions
+  lang = "Guten Tag!".detect_language
+  tags = article.generate_tags(max_tags: 3)
+  puts "   ✅ Phase 3 extensions work!"
+  puts "   🌍 Language: #{lang}"
+  puts "   🏷️  Tags: #{tags.join(', ')}"
 rescue LoadError
   puts "   ⚠️  String extensions not loaded (optional)"
 rescue => e
   puts "   ❌ Error: #{e.message}"
 end
 
-puts "\n🎉 Manual testing complete - Phase 1 & 2!"
+puts "\n🎉 Manual testing complete - Phase 1, 2 & 3!"
 puts "\n💡 Tips:"
 puts "   • Try different models: RubyLLM::Text.summarize(text, model: 'claude-sonnet-4-5')"
 puts "   • Configure method-specific models:"
@@ -184,4 +247,5 @@ puts "     RubyLLM::Text.configure do |config|"
 puts "       config.sentiment_model = 'claude-haiku-4-5'"
 puts "       config.rewrite_model = 'gpt-4.1'"
 puts "     end"
-puts "   • All Phase 2 methods: fix_grammar, sentiment, key_points, rewrite, answer"
+puts "   • Phase 2 methods: fix_grammar, sentiment, key_points, rewrite, answer"
+puts "   • Phase 3 methods: detect_language, generate_tags, anonymize, compare"

@@ -8,6 +8,7 @@ module RubyLLM
       }.freeze
 
       def self.call(text, length: :medium, max_words: nil, model: nil, **options)
+        Validation.validate_text!(text)
         model ||= RubyLLM::Text.config.model_for(:summarize)
 
         prompt = build_prompt(text, length: length, max_words: max_words)

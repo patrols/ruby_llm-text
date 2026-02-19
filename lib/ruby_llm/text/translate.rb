@@ -2,6 +2,8 @@ module RubyLLM
   module Text
     module Translate
       def self.call(text, to:, from: nil, model: nil, **options)
+        Validation.validate_text!(text)
+        Validation.validate_required!(to, "to")
         model ||= RubyLLM::Text.config.model_for(:translate)
 
         prompt = build_prompt(text, to: to, from: from)

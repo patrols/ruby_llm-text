@@ -2,6 +2,7 @@ module RubyLLM
   module Text
     module DetectLanguage
       def self.call(text, include_confidence: false, model: nil, **options)
+        Validation.validate_text!(text)
         model ||= RubyLLM::Text.config.model_for(:detect_language)
 
         prompt = build_prompt(text, include_confidence: include_confidence)

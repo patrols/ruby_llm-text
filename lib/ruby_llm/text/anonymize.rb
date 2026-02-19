@@ -5,6 +5,7 @@ module RubyLLM
       DEFAULT_PII_TYPES = [ :names, :emails, :phones, :addresses ].freeze
 
       def self.call(text, pii_types: DEFAULT_PII_TYPES, replacement_style: :generic, include_mapping: false, model: nil, **options)
+        Validation.validate_text!(text)
         model ||= RubyLLM::Text.config.model_for(:anonymize)
 
         # Handle :all shortcut for all PII types

@@ -4,6 +4,7 @@ module RubyLLM
       DEFAULT_CATEGORIES = [ "positive", "negative", "neutral" ].freeze
 
       def self.call(text, categories: DEFAULT_CATEGORIES, simple: false, model: nil, **options)
+        Validation.validate_text!(text)
         model ||= RubyLLM::Text.config.model_for(:sentiment)
 
         prompt = build_prompt(text, categories: categories, simple: simple)

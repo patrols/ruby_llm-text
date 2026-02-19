@@ -2,6 +2,8 @@ module RubyLLM
   module Text
     module Compare
       def self.call(text1, text2, comparison_type: :similarity, model: nil, **options)
+        Validation.validate_text!(text1, param_name: "text1")
+        Validation.validate_text!(text2, param_name: "text2")
         model ||= RubyLLM::Text.config.model_for(:compare)
 
         prompt = build_prompt(text1, text2, comparison_type: comparison_type)

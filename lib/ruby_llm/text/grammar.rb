@@ -2,6 +2,7 @@ module RubyLLM
   module Text
     module Grammar
       def self.call(text, explain: false, preserve_style: false, model: nil, **options)
+        Validation.validate_text!(text)
         model ||= RubyLLM::Text.config.model_for(:grammar)
 
         prompt = build_prompt(text, explain: explain, preserve_style: preserve_style)

@@ -2,6 +2,7 @@ module RubyLLM
   module Text
     module GenerateTags
       def self.call(text, max_tags: nil, style: :keywords, model: nil, **options)
+        Validation.validate_text!(text)
         model ||= RubyLLM::Text.config.model_for(:generate_tags)
 
         prompt = build_prompt(text, max_tags: max_tags, style: style)

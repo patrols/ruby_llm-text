@@ -2,8 +2,9 @@ module RubyLLM
   module Text
     module Classify
       def self.call(text, categories:, model: nil, **options)
+        Validation.validate_text!(text)
+        Validation.validate_array!(categories, "categories")
         model ||= RubyLLM::Text.config.model_for(:classify)
-        raise ArgumentError, "categories are required" if categories.empty?
 
         prompt = build_prompt(text, categories)
         Base.call_llm(prompt, model: model, **options)
