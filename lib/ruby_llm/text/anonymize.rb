@@ -1,7 +1,9 @@
 module RubyLLM
   module Text
     module Anonymize
-      # Default PII types to detect and anonymize
+      # All available PII types
+      ALL_PII_TYPES = [ :names, :emails, :phones, :addresses, :ssn, :credit_cards ].freeze
+      # Default PII types to detect and anonymize (conservative set)
       DEFAULT_PII_TYPES = [ :names, :emails, :phones, :addresses ].freeze
 
       def self.call(text, pii_types: DEFAULT_PII_TYPES, replacement_style: :generic, include_mapping: false, model: nil, **options)
@@ -9,7 +11,7 @@ module RubyLLM
         model ||= RubyLLM::Text.config.model_for(:anonymize)
 
         # Handle :all shortcut for all PII types
-        pii_types = DEFAULT_PII_TYPES if pii_types == [ :all ]
+        pii_types = ALL_PII_TYPES if pii_types == [ :all ]
 
         prompt = build_prompt(text, pii_types: pii_types, replacement_style: replacement_style, include_mapping: include_mapping)
 
@@ -79,7 +81,7 @@ module RubyLLM
 
       def self.build_pii_instructions(pii_types)
         # Handle :all shortcut
-        pii_types = DEFAULT_PII_TYPES if pii_types == [ :all ]
+        pii_types = ALL_PII_TYPES if pii_types == [ :all ]
 
         instructions = [ "Identify and replace the following types of PII:" ]
 
@@ -112,7 +114,7 @@ module RubyLLM
 
       def self.build_replacement_instructions(replacement_style, pii_types)
         # Handle :all shortcut
-        pii_types = DEFAULT_PII_TYPES if pii_types == [ :all ]
+        pii_types = ALL_PII_TYPES if pii_types == [ :all ]
 
         instructions = [ "Use #{replacement_style} replacement tokens:" ]
 
@@ -149,6 +151,12 @@ module RubyLLM
           if pii_types.include?(:addresses)
             instructions << "- Addresses: [ADDRESS_1], [ADDRESS_2], etc."
           end
+          if pii_types.include?(:ssn)
+            instructions << "- SSN: [SSN_1], [SSN_2], etc."
+          end
+          if pii_types.include?(:credit_cards)
+            instructions << "- Credit Cards: [CREDIT_CARD_1], [CREDIT_CARD_2], etc."
+          end
         when :descriptive
           if pii_types.include?(:names)
             instructions << "- Names: [FIRST_NAME], [LAST_NAME], [FULL_NAME]"
@@ -161,6 +169,12 @@ module RubyLLM
           end
           if pii_types.include?(:addresses)
             instructions << "- Addresses: [STREET_ADDRESS], [CITY], [POSTAL_CODE]"
+          end
+          if pii_types.include?(:ssn)
+            instructions << "- SSN: [SOCIAL_SECURITY_NUMBER]"
+          end
+          if pii_types.include?(:credit_cards)
+            instructions << "- Credit Cards: [CREDIT_CARD_NUMBER]"
           end
         else
           return build_replacement_instructions(:generic, pii_types)
